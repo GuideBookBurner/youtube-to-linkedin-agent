@@ -1,0 +1,5 @@
+yt-dlp>=2026.3.3
+youtube-transcript-api>=1.2.4
+anthropic>=0.84.0
+python-dotenv>=1.2.2
+requests>=2.31.0
