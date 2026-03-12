@@ -1,7 +1,7 @@
 """
 LinkedIn post generator using Claude claude-opus-4-6.
 Takes a YouTube video transcript and generates a LinkedIn post
-that matches the speaker's tone of voice.
+written as an SEO professional sharing insights with their network.
 """
 
 import anthropic
@@ -17,27 +17,28 @@ def generate_linkedin_post(transcript: str, video_title: str, video_url: str) ->
         video_url: The URL of the YouTube video.
 
     Returns:
-        A LinkedIn post as a string, matching the speaker's tone.
+        A LinkedIn post as a string, written as an SEO professional sharing insights.
     """
     client = anthropic.Anthropic()
 
-    system_prompt = """You are an expert at transforming YouTube video transcripts into
-compelling LinkedIn posts. Your task is to:
+    system_prompt = """You are a knowledgeable SEO professional sharing the latest insights and tips with your LinkedIn network. You have just watched a YouTube video and are posting about what you learned.
 
-1. Carefully analyze the speaker's tone, vocabulary, and communication style from the transcript
-2. Identify the key insights, takeaways, and most compelling points
-3. Write a LinkedIn post that sounds authentically like the speaker — not a summary, but
-   a post that captures their personality, energy, and unique way of expressing ideas
-4. Structure the post for LinkedIn's format: engaging hook, valuable content, clear CTA
-5. Use the speaker's own phrases and expressions where natural
-6. Keep it between 150-300 words — punchy and shareable
-7. End with a question or call-to-action that invites engagement
-8. Do NOT use excessive emojis — match the speaker's actual style
-9. Do NOT include hashtags unless the speaker's style clearly calls for them
+Your task is to write a LinkedIn post that:
+
+1. Reads like a genuine SEO news update or insight share, not a video summary
+2. Positions you (the poster) as a thoughtful SEO professional commenting on what's happening in the SEO world
+3. Pulls out the most actionable tips, strategy shifts, or news-worthy points from the transcript
+4. Opens with a strong, specific hook tied to the SEO insight, not a reference to the video
+5. Flows in a conversational but professional tone, like sharing a useful update with colleagues
+6. Keeps it between 150-300 words, punchy and easy to scan
+7. Ends with a question or observation that invites colleagues to weigh in
+8. Uses plain dashes (-) if a dash is needed, never em dashes
+9. Does not use excessive emojis
+10. Does not include hashtags
 
 Output ONLY the LinkedIn post text, nothing else."""
 
-    user_message = f"""Here is a YouTube video transcript to transform into a LinkedIn post.
+    user_message = f"""Here is a YouTube video transcript about SEO. Write a LinkedIn post sharing the key insights as an SEO professional commenting on the topic.
 
 Video title: {video_title}
 Video URL: {video_url}
@@ -45,7 +46,7 @@ Video URL: {video_url}
 Full transcript:
 {transcript}
 
-Write a LinkedIn post in the speaker's authentic tone of voice based on this transcript."""
+Write the LinkedIn post as an SEO professional sharing useful insights with your network."""
 
     print("Generating LinkedIn post with Claude claude-opus-4-6...")
 

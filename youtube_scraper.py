@@ -3,8 +3,23 @@ YouTube scraper module using yt-dlp and youtube-transcript-api.
 Fetches the latest video from a channel and retrieves its transcript.
 """
 
+import re
+
 import yt_dlp
 from youtube_transcript_api import YouTubeTranscriptApi, NoTranscriptFound, TranscriptsDisabled
+
+# Keywords that indicate a video is about an event, meetup, or conference rather than educational content
+_EVENT_KEYWORDS = re.compile(
+    r"\b(event|meetup|meet-up|meet up|gathering|conference|summit|seminar|webinar|"
+    r"live\s+stream|livestream|workshop|networking|speaker\s+series|panel|expo|"
+    r"unconference|hackathon|bootcamp|boot\s+camp)\b",
+    re.IGNORECASE,
+)
+
+
+def is_event_video(title: str, description: str = "") -> bool:
+    """Return True if the video appears to be about an event rather than educational content."""
+    return bool(_EVENT_KEYWORDS.search(title) or _EVENT_KEYWORDS.search(description or ""))
 
 
 def get_latest_video(channel_url: str) -> dict:
@@ -20,7 +35,7 @@ def get_latest_video(channel_url: str) -> dict:
     ydl_opts = {
         "quiet": True,
         "extract_flat": True,
-        "playlist_items": "1",  # Only fetch the most recent video
+        "playlist_items": "1-10",  # Fetch recent videos so we can skip event ones
         "forcejson": True,
     }
 
@@ -32,18 +47,27 @@ def get_latest_video(channel_url: str) -> dict:
     if not info or "entries" not in info or not info["entries"]:
         raise ValueError(f"No videos found for channel: {channel_url}")
 
-    entry = info["entries"][0]
-    video_id = entry.get("id") or entry.get("url", "").split("v=")[-1]
+    for entry in info["entries"]:
+        title = entry.get("title", "")
+        description = entry.get("description", "")
+        if is_event_video(title, description):
+            print(f"Skipping event/conference video: '{title}'")
+            continue
 
-    return {
-        "video_id": video_id,
-        "title": entry.get("title", "Unknown Title"),
-        "description": entry.get("description", ""),
-        "url": f"https://www.youtube.com/watch?v={video_id}",
-        "duration": entry.get("duration"),
-        "view_count": entry.get("view_count"),
-        "upload_date": entry.get("upload_date"),
-    }
+        video_id = entry.get("id") or entry.get("url", "").split("v=")[-1]
+        return {
+            "video_id": video_id,
+            "title": title,
+            "description": description,
+            "url": f"https://www.youtube.com/watch?v={video_id}",
+            "duration": entry.get("duration"),
+            "view_count": entry.get("view_count"),
+            "upload_date": entry.get("upload_date"),
+        }
+
+    raise ValueError(
+        f"No suitable educational videos found in the last 10 uploads for channel: {channel_url}"
+    )
 
 
 def get_transcript(video_id: str, preferred_languages: list[str] | None = None) -> str:
