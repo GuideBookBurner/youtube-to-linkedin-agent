@@ -61,7 +61,8 @@ def get_transcript(video_id: str, preferred_languages: list[str] | None = None) 
         preferred_languages = ["en", "en-US", "en-GB"]
 
     try:
-        transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+        api = YouTubeTranscriptApi()
+        transcript_list = api.list(video_id)
 
         # Try preferred languages first (manually created), then auto-generated
         try:
