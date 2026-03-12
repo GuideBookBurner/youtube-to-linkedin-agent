@@ -14,18 +14,20 @@ class LinkedInPoster:
 
     def __init__(self):
         self.access_token = os.environ.get("LINKEDIN_ACCESS_TOKEN")
-        self.person_urn = os.environ.get("LINKEDIN_PERSON_URN")
+        company_id = os.environ.get("LINKEDIN_COMPANY_ID")
 
         if not self.access_token:
             raise ValueError(
                 "LINKEDIN_ACCESS_TOKEN is not set. "
                 "Please provide your LinkedIn OAuth2 access token in the .env file."
             )
-        if not self.person_urn:
+        if not company_id:
             raise ValueError(
-                "LINKEDIN_PERSON_URN is not set. "
-                "Please provide your LinkedIn person URN (e.g. urn:li:person:ABC123) in the .env file."
+                "LINKEDIN_COMPANY_ID is not set. "
+                "Please provide your LinkedIn Company Page ID in the .env file."
             )
+
+        self.author_urn = f"urn:li:organization:{company_id}"
 
     def _headers(self) -> dict:
         return {
@@ -55,7 +57,7 @@ class LinkedInPoster:
             The LinkedIn API response dict.
         """
         payload = {
-            "author": self.person_urn,
+            "author": self.author_urn,
             "lifecycleState": "PUBLISHED",
             "specificContent": {
                 "com.linkedin.ugc.ShareContent": {
