@@ -14,20 +14,20 @@ class LinkedInPoster:
 
     def __init__(self):
         self.access_token = os.environ.get("LINKEDIN_ACCESS_TOKEN")
-        company_id = os.environ.get("LINKEDIN_COMPANY_ID")
+        person_urn = os.environ.get("LINKEDIN_PERSON_URN")
 
         if not self.access_token:
             raise ValueError(
                 "LINKEDIN_ACCESS_TOKEN is not set. "
                 "Please provide your LinkedIn OAuth2 access token in the .env file."
             )
-        if not company_id:
+        if not person_urn:
             raise ValueError(
-                "LINKEDIN_COMPANY_ID is not set. "
-                "Please provide your LinkedIn Company Page ID in the .env file."
+                "LINKEDIN_PERSON_URN is not set. "
+                "Please provide your LinkedIn Person URN in the .env file."
             )
 
-        self.author_urn = f"urn:li:organization:{company_id}"
+        self.author_urn = person_urn
 
     def _headers(self) -> dict:
         return {
